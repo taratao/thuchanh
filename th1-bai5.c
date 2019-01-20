@@ -1,5 +1,5 @@
 /*
-Bài 1:
+Bài 5.1:
 Cho cấu trúc dữ liệu đồ thị được khai báo sử dụng ma trận đỉnh - cung như sau:
    typedef struct {
       int A[100][500];
