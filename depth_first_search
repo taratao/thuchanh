@@ -1,0 +1,178 @@
+/*
+Duyet theo chieu sau
+*/
+
+#include <stdio.h>
+
+#define MAX_N 100
+
+
+typedef struct{
+	int data[MAX_N];
+	int size;
+}List;
+
+typedef struct{
+	List adj[MAX_N];
+	int n, m;
+}Graph;
+
+typedef struct{
+	int data[MAX_N];
+	int size;
+}Stack;
+
+void make_null_stack(Stack*);
+void push(Stack*,int);
+int top(Stack*);
+void pop(Stack*);
+int empty(Stack*);
+void print_stack(Stack);
+
+void make_null_list(List*);
+void push_back(List*,int);
+int element_at(List*,int);
+int size(List*);
+void print_list(List*);
+
+void init_graph(Graph*,int,int);
+void add_edge(Graph*,int,int);
+List neighbors(Graph*,int);
+void dfs(Graph*);
+
+int main(){
+	freopen("dt.txt", "r", stdin);
+	int n, m, u, v, i, j;
+	Graph G;
+	scanf("%d%d", &n, &m);
+	init_graph(&G, n, m);
+	for(i = 1; i <= m; i++){
+		scanf("%d%d", &u, &v);
+		add_edge(&G, u, v);
+	}
+	dfs(&G);
+    
+	return 0;
+}
+
+/*********************************************/
+
+void make_null_list(List *list){
+	list->size = 0;
+}
+
+void push_back(List *list, int x){
+	list->data[list->size] = x;
+	list->size++;
+}
+
+int element_at(List *list, int p){
+	return list->data[p-1];
+}
+
+int size(List *list){
+	return list->size;
+}
+
+void print_list(List *L){
+	int i;
+	printf("[ ");
+	for(i = 1; i <= L->size; i++){
+		printf("%d ", element_at(L,i));
+	}
+	printf("]\n");
+}
+
+/***********************************************/
+
+void make_null_satck(Stack *S){
+	S->size = 0;
+}
+
+void push(Stack *S, int x){
+	S->data[S->size] = x;
+	S->size++;
+}
+
+void pop(Stack *S){
+	S->size--;
+}
+
+int top(Stack *S){
+	return S->data[S->size-1];
+}
+
+int empty(Stack *S){
+	return S->size == 0;
+}
+
+void print_stack(Stack S){
+	printf("frontier = [ ");
+	while(!empty(&S)){
+		int x = top(&S); pop(&S);
+		printf("%d ", x);
+	}
+	printf("]\n");
+}
+
+/*************************************************/
+
+void init_graph(Graph *G, int n, int m){
+	G->n = n;
+	G->m = m;
+	int i;
+	for(i = 1; i <= n; i++){
+		make_null_list(&G->adj[i]);
+	}
+}
+
+void add_edge(Graph *G, int x, int y){
+	push_back(&G->adj[x], y);
+	push_back(&G->adj[y], x);
+}
+
+List neighbors(Graph *G, int x){
+    return G->adj[x];	
+}
+
+/*******************************************************/
+
+void dfs(Graph *G){
+	Stack frontier;
+	int mark[MAX_N];
+	int j;
+	
+	for(j = 1; j <= G->n; j++){
+		mark[j] = 0;
+	}
+	make_null_satck(&frontier);
+	
+	push(&frontier, 1);
+	printf("Ban dau: ");//Bo dong nay
+	print_stack(frontier);
+	
+	while(!empty(&frontier)){
+		int x = top(&frontier); pop(&frontier);
+		printf("Lay %d ra: ", x); //Bo dong nay
+	    print_stack(frontier); //Bo dong nay
+		
+		if(mark[x] != 0){
+			printf("mark[%d] != 0 continue\n", x); //Bo dong nay
+			continue;
+		}
+		
+		printf("Duyet %d\n", x); 
+		mark[x] = 1;
+		printf("mark[%d] = 1\n", x); //Bo dong nay
+		
+		List list = neighbors(G, x);
+		printf("Lay danh sach ke cua %d: ", x); print_list(&list); //Bo dong nay
+		printf("Duyet cac phan tu cua %d\n", x); //Bo dong nay
+		for(j = 1; j <= size(&list); j++){
+			int y = element_at(&list, j);
+			push(&frontier, y);
+			printf("+ Push %d vao frontier: ", y); print_stack(frontier); //Bo dong nay
+		}
+		printf("\n"); // Bo dong nay
+	}
+}
