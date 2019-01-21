@@ -1,0 +1,176 @@
+
+// Duyệt theo chiều rộng
+#include <stdio.h>
+
+#define MAX_N 100
+
+
+typedef struct{
+	int data[MAX_N];
+	int size;
+}List;
+
+typedef struct{
+	List adj[MAX_N];
+	int n, m;
+}Graph;
+
+typedef struct{
+	int data[MAX_N];
+	int front, rear;
+}Queue;
+
+void make_null_queue(Queue*);
+void push(Queue*,int);
+int empty(Queue*);
+int top(Queue*);
+void pop(Queue*);
+void print_queue(Queue);
+
+void make_null_list(List*);
+void push_back(List*,int);
+int element_at(List*,int);
+int size(List*);
+void print_list(List*);
+
+void init_graph(Graph*,int,int);
+void add_edge(Graph*,int,int);
+List neighbors(Graph*,int);
+void bfs(Graph*);
+
+int main(){
+	freopen("dt.txt", "r", stdin);
+	int n, m, u, v, i, j;
+	Graph G;
+	scanf("%d%d", &n, &m);
+	init_graph(&G, n, m);
+	for(i = 1; i <= m; i++){
+		scanf("%d%d", &u, &v);
+		add_edge(&G, u, v);
+	}
+	bfs(&G);
+    
+	return 0;
+}
+/**********************************************/
+
+void bfs(Graph* G){
+	Queue frontier;
+	int mark[MAX_N];
+	int j;
+	
+	for(j = 1; j <= G->n; j++){
+		mark[j] = 0;
+	}
+	make_null_queue(&frontier);
+    push(&frontier, 1);
+    printf("push %d vao frontier: ", 1); // Bo dong nay
+	print_queue(frontier); // Bo dong nay
+	printf("Danh dau %d\n", 1); // Bo dong nay
+	mark[1] = 1;
+	printf("\n-->Vao vong lap chinh<--\n"); // Bo dong nay
+	while(!empty(&frontier)){
+		int x = top(&frontier); pop(&frontier);
+		printf("Lay %d ra: ", x); // Bo dong nay
+		print_queue(frontier); // Bo dong nay
+		printf("<---------------Duyet %d---------------->\n", x); // Bo dong nay
+		printf("Lay danh dach ke cua %d: ", x); // Bo dong nay
+		List list = neighbors(G,x);
+		print_list(&list);
+		printf("Duyet cac dinh ke cua %d\n", x); // Bo dong nay
+		int j;
+		for(j = 1; j <= size(&list); j++){
+			int y = element_at(&list, j);
+			if(mark[y] == 0){
+				printf("+ mark[%d] == 0\n", y); // Bo dong nay
+				mark[y] = 1;
+				printf("--> Danh dau %d\n", y); // Bo dong nay
+				push(&frontier,y);
+				printf(" .. push %d vao frontier: ", y); print_queue(frontier); // Bo dong nay
+			}
+		}
+		printf("\n");
+	}
+}
+
+/*********************************************/
+
+void make_null_list(List *list){
+	list->size = 0;
+}
+
+void push_back(List *list, int x){
+	list->data[list->size] = x;
+	list->size++;
+}
+
+int element_at(List *list, int p){
+	return list->data[p-1];
+}
+
+int size(List *list){
+	return list->size;
+}
+
+void print_list(List *L){
+	int i;
+	printf("[ ");
+	for(i = 1; i <= L->size; i++){
+		printf("%d ", element_at(L,i));
+	}
+	printf("]\n");
+}
+
+/***********************************************/
+
+void make_null_queue(Queue *Q){
+	Q->front = 0;
+	Q->rear = -1;
+}
+
+void push(Queue *Q, int x){
+	Q->rear++;
+	Q->data[Q->rear] = x;
+}
+
+void pop(Queue *Q){
+	Q->front++;
+}
+
+int top(Queue *Q){
+	return Q->data[Q->front];
+}
+
+int empty(Queue *Q){
+	return Q->front > Q->rear;
+}
+
+void print_queue(Queue Q){
+	printf("[ ");
+	while(!empty(&Q)){
+		int x = top(&Q); pop(&Q);
+		printf("%d ", x);
+	}
+	printf("]\n");
+}
+/*************************************************/
+
+void init_graph(Graph *G, int n, int m){
+	G->n = n;
+	G->m = m;
+	int i;
+	for(i = 1; i <= n; i++){
+		make_null_list(&G->adj[i]);
+	}
+}
+
+void add_edge(Graph *G, int x, int y){
+	push_back(&G->adj[x], y);
+	push_back(&G->adj[y], x);
+}
+
+List neighbors(Graph *G, int x){
+    return G->adj[x];	
+}
+
+/*******************************************************/
